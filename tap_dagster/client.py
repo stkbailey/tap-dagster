@@ -41,9 +41,9 @@ class DagsterStream(GraphQLStream):
         # TODO: Use records JSONPath instead.
         resp_json = response.json()
         for row in resp_json.get("data", {}).get("runsOrError", {}).get("results"):  # TODO: Generalize for any stream
-            row["startTime"] = pendulum.from_timestamp(row["startTime"])
-            if row["endTime"]:
-                row["endTime"] = pendulum.from_timestamp(row["endTime"])
+            for field in ["startTime", "endTime", "updateTime"]:
+                if row.get(field):
+                    row[field] = pendulum.from_timestamp(row[field])
             yield row
 
     def validate_response(self, response: requests.Response) -> None:
