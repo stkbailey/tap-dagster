@@ -1,5 +1,6 @@
 """GraphQL client handling, including DagsterStream base class."""
 
+import json
 import pendulum
 import requests
 from pathlib import Path
@@ -52,12 +53,12 @@ class DagsterStream(GraphQLStream):
             or 500 <= response.status_code < 600
         ):
             msg = self.response_error_message(response)
-            details = response.json().get("errors", [])[0].get("message")
+            details = json.dumps(response.json())
             error_msg = f"{msg} - {details}"
             raise RetriableAPIError(error_msg, response)
         elif 400 <= response.status_code < 500:
             msg = self.response_error_message(response)
-            details = response.json().get("errors", [])[0].get("message")
+            details = json.dumps(response.json())
             error_msg = f"{msg} - {details}"
             raise FatalAPIError(error_msg)
 
